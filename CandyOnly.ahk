@@ -38,9 +38,14 @@ SetBatchLines -1
 ComObjError(0)
 Menu, Tray, UseErrorLevel
 ; #NoTrayIcon
+
+CandyLodingMenuName = ---Candy---
+tooltip, %CandyLodingMenuName%
+
 SkSub_CreateTrayMenu()   ;显示一个自定义的托盘菜单
 Gosub, Label_Candy_Start
 Exitapp
+
  /*
 ╔══════════════════════════════════════╗
 <<<<〇全局设置>>>>                                                  ║
@@ -61,7 +66,7 @@ Label_Candy_ReadConfig_File:
     Transform,Candy_ProFile_Ini,Deref,%Candy_ProFile_Ini%                         ;ini文件路径可以使用自定义变量以及环境变量
     IfNotExist %Candy_ProFile_Ini%         ;如果配置文件不存在，则发出警告，且终止
     {
-        traytip, Candy ERROR ,对热键%A_thishotkey% 定义的配置文件不存在! `n--------`n请检查%Candy_ProFile_Ini%,,0x3
+        tooltip, 对热键%A_thishotkey% 定义的配置文件不存在! `n--------`n请检查%Candy_ProFile_Ini%
         sleep,3000
         return
     }
@@ -111,7 +116,7 @@ Label_Candy_ReadMyVar:
     {
         Clipboard := Candy_Saved_ClipBoard    ;还原粘贴板
         Candy_Saved_ClipBoard =
-        Traytip,Candy Info, 貌似没找到啥东东,,0x2
+        tooltip, 貌似没找到啥东东
         sleep,3000
         Return
     }
@@ -238,7 +243,7 @@ Label_Candy_DrawMenu:
 
  ;加第一行菜单，缩略显示选中的内容，该菜单让你拷贝其内容
     ;CandyMenu_FirstItem:=Strlen(CdSel_NoSpace:=Trim(CandySel)) >20 ? SubStr(CdSel_NoSpace,1,10) . "..." . SubStr(CdSel_NoSpace,-10) : CdSel_NoSpace
-    CandyMenu_FirstItem = Copy As Text
+    CandyMenu_FirstItem = Copy As Text`t(&``)
     Menu CandyTopLevelMenu,Add,%CandyMenu_FirstItem%,Label_Candy_CopyFullpath
     Menu CandyTopLevelMenu,Default,%CandyMenu_FirstItem%
     Candy_Firstline_Icon:=SkSub_Get_Firstline_Icon(CandySel_Ext,CandySel,CandyMenu_IconDir "\Extension")
@@ -272,6 +277,7 @@ Label_Candy_DrawMenu:
         Menu,CandyTopLevelMenu,Disable,%CandyItem%
          ;ToolTip ;若要评估出menu时间，这里需打开 ,共三处，3/3
     }
+    tooltip
     Menu,CandyTopLevelMenu,show
     Return
 
@@ -458,11 +464,6 @@ Label_Candy_RunCommand:
     {
         Gui +LastFound +OWnDialogs +AlwaysOnTop
         MsgBox %Candy_Cmd_Str2%
-    }
-    Else If (Candy_Cmd_Str1="Traytip") ; 托盘消息
-    {
-        Traytip, Candy, %Candy_Cmd_Str2%,,0x2
-        sleep,3000
     }
     Else If (Candy_Cmd_Str1="Config")
     {
